@@ -1,120 +1,100 @@
-# Blue Prince Dev Menus
+# Blue Prince Mod Loader
 
-Blue Prince ships with the developers' own internal cheat/debug menu still in the game
-files. The game deletes it the moment a scene loads. **KeepDevObjects** is a tiny
-MelonLoader mod that stops that one deletion, so the menu stays alive and you can use it.
+A small, portable mod manager for **Blue Prince**. It installs MelonLoader for you,
+enables/disables mods without copying files (it links them into the game), fetches mods and
+their dependencies from the web, and can back up your saves. It ships with the **Developer
+Cheat Menu** mod built in.
 
-Single-player only. No online, no anti-cheat, so this is safe to run.
-
-> ⚠️ **Spoilers + save safety.** The dev menu lets you spawn any room and item and set
-> progress flags, so it spoils content. **Back up your save folder before using it** —
-> cheats can permanently change a save. Using a separate profile is a good idea.
+Single-player game, no anti-cheat, so this is safe to run. Cheats can permanently change a
+save, so keep the save-backup feature on if you use them.
 
 ---
 
-## Requirements
+## For users
 
-- **Blue Prince** (Steam, Windows).
-- **[MelonLoader](https://github.com/LavaGang/MelonLoader/releases)** installed on the
-  game. Run the auto-installer, point it at `BLUE PRINCE.exe`, install, then launch the
-  game once so it finishes setup and quit.
+1. Download the latest release, unzip anywhere (keep `BPModManager.exe` and the `Library`
+   folder together).
+2. Run `BPModManager.exe`. It auto-detects your Blue Prince install via Steam.
+3. Click **Install MelonLoader** (one time).
+4. Tick a mod to enable it. **Keep Dev Objects (Cheat Menu)** is included; **UnityExplorer**
+   downloads itself (and its dependency) when you enable it.
+5. Click **Launch Blue Prince**.
 
-## Install
+Nothing is added to the game except MelonLoader and links to your enabled mods, and
+disabling removes exactly those.
 
-1. Close the game.
-2. Download **`KeepDevObjects.dll`** from this repo.
-3. Drop it into the game's `Mods` folder:
-   ```
-   ...\steamapps\common\Blue Prince\Mods\KeepDevObjects.dll
-   ```
-4. Launch the game.
+## Features
 
-**Confirm it loaded** — open `...\Blue Prince\MelonLoader\Latest.log` and look for:
-```
-[Keep_Dev_Objects] Patched FurySdkDestroyIfCheatsNotEnabled.OnEnter (filtered=True).
-```
+- **MelonLoader install** — one click; pulls the official release and sets it up.
+- **Link-based enable/disable** — a mod's files are symlinked (or hard-linked, or copied)
+  into the game's `Mods`/`UserLibs`, tracked so removal is exact. A banner tells you which
+  method is in use and offers to enable symlinks (Developer Mode / admin) when useful.
+- **Fetch mods + dependencies** — a mod can declare a GitHub release as its source; the
+  manager downloads it and links its `Mods\` and `UserLibs\` contents. UnityExplorer works
+  this way.
+- **Import what you already have** — add loose `.dll`s, or adopt mods already in the game's
+  `Mods` folder.
+- **Save & mod backups** — back up the save folder (with restore + optional auto-backup
+  before launch) and the whole mod library.
 
-## Turn the menu on
+## The built-in cheat menu
 
-Get into an actual run (not the main menu), then:
+**Keep Dev Objects** un-hides Blue Prince's own developer cheat menu (`Cheaters Failz`),
+which the retail build deletes on load, and auto-shows the overlay so it appears just from
+having the mod enabled. In-game hotkeys (from the game's own overlay):
 
-**Press your mouse's side button (mouse button 4 / the "forward" thumb button).**
+| Key | Action | | Key | Action |
+|-----|--------|-|-----|--------|
+| `F` | Floorplan Selection (spawn any room) | | `0` | Free cam |
+| `I` | Item Selection (give any item) | | `1`/`2` | FOV down/up |
+| `R` | Redraw floorplans | | `3`/`4` | Move speed down/up |
+| `L` | Luck Up | | `5`/`6` | Camera tilt |
+| | | | `M` | Camera recorder |
 
-You'll see **`CF ACTIVATED`** on screen. The cheat system is now live.
+See [`mods/KeepDevObjects`](mods/KeepDevObjects) for the mod's source and details.
 
-> No 5-button mouse? See [Troubleshooting](#troubleshooting).
+## Command line
 
-## Controls
-
-These are the game's own dev hotkeys, taken from its built-in on-screen overlay.
-
-**Cheat actions**
-
-| Key | Does |
-|-----|------|
-| `F` | **Floorplan Selection** — pick and spawn any room in the game |
-| `I` | **Item Selection** — give yourself any item |
-| `R` | Redraw the current floorplan options |
-| `T` | Turn / rotate floorplans |
-| `L` | Luck Up |
-
-**Free camera / cinematic**
-
-| Key | Does |
-|-----|------|
-| `0` | Toggle free cam |
-| `Space` | Toggle HUD |
-| `1` / `2` | FOV down / up |
-| `3` / `4` | Move speed down / up |
-| `5` / `6` | Camera tilt down / up |
-| `8` / `9` | Lower / raise camera |
-| `M` | Camera Recorder (keyframe camera-path tool) |
-
-`F` opens a grid with a button for every room in the game (including the secret ones);
-click to spawn it. `I` opens a grid with every item; click to add it to your inventory.
-There is also a typed command console for resources (codes like `GEM`, `GOLD`, `KEY`,
-`STEP`, `LUCK`, `DAY`), but the `F` / `I` menus cover most of it.
-
-## Troubleshooting
-
-**"CF ACTIVATED" never shows / no side mouse button.** The activation is hard-wired to
-mouse button 4, which not every mouse has. Either remap a spare button to "mouse button
-4 / forward" in your mouse software, or use [UnityExplorer](https://github.com/yukieiji/UnityExplorer)
-(another MelonLoader mod): browse to `__SYSTEM > Cheaters Failz (Back Doors)` and toggle
-its child UI objects active by hand.
-
-**Hotkeys do nothing after activating.** Make sure you're in a run, not a menu, and that
-"CF ACTIVATED" appeared. If the on-screen overlay isn't up, try the publisher-mode toggle
-(press `P` then `L`).
-
-**Game crashes on launch.** Make sure you only added `KeepDevObjects.dll` and that
-MelonLoader launches cleanly on its own first.
-
-**Undo it.** Delete `KeepDevObjects.dll` from `Mods`. The dev menu goes back to
-self-deleting and the game is exactly as shipped.
-
-## How it works
-
-The menu is a GameObject named `Cheaters Failz (Back Doors)`. It carries a PlayMaker
-action, `FurySdkDestroyIfCheatsNotEnabled`, whose `OnEnter` destroys the object on load
-in retail builds (the "if cheats not enabled" check is a compile-time constant that was
-optimized away, so there's no in-game toggle). The mod puts a Harmony prefix on that
-`OnEnter` and skips it for this object, so it survives scene load. Nothing else about the
-game is touched. By default the mod is filtered to keep only the cheat menu and let every
-other dev object self-destruct as normal (keeping all of them crashes boot).
-
-## Building from source
-
-Source is in [`src/`](src). It's a standard MelonLoader IL2CPP mod targeting `net6`.
-The `.csproj` references MelonLoader, Harmony, Il2CppInterop and the game's interop
-assemblies straight from your Blue Prince install (edit `GameDir` if yours differs), then:
+The manager is also scriptable (any argument runs headless; no argument opens the GUI):
 
 ```
+BPModManager status | diagnose
+BPModManager enable <id> | disable <id> | add <path> | import-existing
+BPModManager install-melonloader
+BPModManager backup | backups | restore <name> | savedir
+BPModManager backup-mods | restore-mods <name>
+                                            [--game "C:\path\to\Blue Prince"]
+```
+
+## Adding a mod
+
+Create `Library\<Id>\` with the mod's files and a `modinfo.json`, either bundled:
+
+```json
+{ "id": "MyMod", "name": "My Mod", "version": "1.0", "description": "…",
+  "files": { "Mods": [ "MyMod.dll" ], "UserLibs": [] } }
+```
+
+…or fetched from a GitHub release (the zip should contain `Mods\`/`UserLibs\`):
+
+```json
+{ "id": "UnityExplorer", "name": "UnityExplorer", "description": "…",
+  "source": { "githubRepo": "yukieiji/UnityExplorer",
+              "assetName": "UnityExplorer.MelonLoader.IL2CPP.CoreCLR.zip" } }
+```
+
+## Building
+
+```
+cd src
 dotnet build -c Release
+dotnet publish -c Release        # self-contained single-file win-x64 exe
 ```
+Targets .NET 10. The built-in mod's source is under `mods/KeepDevObjects` (a MelonLoader
+IL2CPP mod, `net6`).
 
 ## Disclaimer
 
-Not affiliated with or endorsed by the developers or publisher. This uses content the
-developers left in the shipped game for their own testing. Provided as-is; use on your
-own single-player copy at your own risk. Back up your saves.
+Not affiliated with or endorsed by the developers or publisher. Uses content the developers
+left in the shipped game. Provided as-is; use on your own single-player copy at your own
+risk, and back up your saves.

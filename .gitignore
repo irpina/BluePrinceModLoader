@@ -1,5 +1,11 @@
 bin/
 obj/
 out/
+dist/
+publish/
+SaveBackups/
+manager-state.json
+manager-settings.json
+game-path.txt
 *.user
 .vs/

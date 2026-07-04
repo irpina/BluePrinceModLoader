@@ -1,0 +1,11 @@
+{
+  "id": "UnityExplorer",
+  "name": "UnityExplorer (in-game inspector + C# console)",
+  "version": "latest",
+  "description": "Runtime GameObject/scene inspector, freecam, and C# console. Downloaded from GitHub on first enable, together with its UniverseLib dependency.",
+  "source": {
+    "githubRepo": "yukieiji/UnityExplorer",
+    "assetName": "UnityExplorer.MelonLoader.IL2CPP.CoreCLR.zip"
+  },
+  "files": {}
+}
