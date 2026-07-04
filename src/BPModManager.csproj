@@ -14,6 +14,9 @@
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <!-- ~116 MB -> ~49 MB; still self-contained so users need no .NET install.
+         (WinForms blocks IL trimming, so compression is the safe size lever.) -->
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
     <AssemblyVersion>0.2.0</AssemblyVersion>
     <FileVersion>0.2.0</FileVersion>
   </PropertyGroup>

@@ -223,10 +223,13 @@ public sealed class ModLibrary
                         }
                         else
                         {
-                            throw new IOException(
-                                $"'{target}' already exists and differs from the library copy " +
-                                "(a different version installed manually?). Remove it first, or use " +
-                                "'Import mods from game folder' to adopt it.");
+                            // A different build sits there (e.g. a dependency from a manual install).
+                            // The user explicitly enabled this mod, so its version wins - back the
+                            // old file up and replace it rather than blocking.
+                            var backup = target + ".replaced-" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                            File.Move(target, backup);
+                            log($"  replaced a different existing {Path.GetFileName(file)} " +
+                                $"(old one backed up as {Path.GetFileName(backup)})");
                         }
                     }
                     var method = LinkFile(source, target);
