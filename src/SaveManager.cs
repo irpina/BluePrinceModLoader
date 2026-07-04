@@ -41,10 +41,13 @@ public static class SaveManager
             ?? throw new InvalidOperationException("Blue Prince save folder not found (has the game been run once?).");
         Directory.CreateDirectory(backupDir);
         var suffix = string.IsNullOrEmpty(tag) ? "" : "_" + tag;
-        var name = $"BluePrince_save{suffix}_{DateTime.Now:yyyyMMdd_HHmmss}.zip";
-        var dest = System.IO.Path.Combine(backupDir, name);
+        var stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        // Always a NEW file - never overwrite an existing backup. Guard same-second collisions.
+        var dest = System.IO.Path.Combine(backupDir, $"BluePrince_save{suffix}_{stamp}.zip");
+        for (int n = 2; File.Exists(dest); n++)
+            dest = System.IO.Path.Combine(backupDir, $"BluePrince_save{suffix}_{stamp}_{n}.zip");
         ZipFile.CreateFromDirectory(save, dest, CompressionLevel.Optimal, includeBaseDirectory: false);
-        log($"Backed up saves -> {name} ({new FileInfo(dest).Length / 1024} KB)");
+        log($"Backed up saves -> {System.IO.Path.GetFileName(dest)} ({new FileInfo(dest).Length / 1024} KB)");
         return dest;
     }
 
@@ -68,16 +71,20 @@ public static class SaveManager
         log($"Restored saves from {System.IO.Path.GetFileName(zipPath)}.");
     }
 
-    /// <summary>Keep the newest <paramref name="keep"/> normal backups; never prunes safety snapshots.</summary>
+    /// <summary>
+    /// Keep only the newest <paramref name="keep"/> AUTOMATIC (pre-launch) backups.
+    /// Manual "Back up saves" backups and safety snapshots are never pruned - they're
+    /// kept until the user deletes them, so a new backup never removes an old one.
+    /// </summary>
     public static int Prune(string backupDir, int keep, Action<string> log)
     {
-        var normal = ListBackups(backupDir).Where(b => !b.IsSafety).ToList();
+        var autos = ListBackups(backupDir).Where(b => b.IsAuto).ToList(); // prelaunch only
         int removed = 0;
-        foreach (var old in normal.Skip(Math.Max(1, keep)))
+        foreach (var old in autos.Skip(Math.Max(1, keep)))
         {
             try { File.Delete(old.Path); removed++; } catch { }
         }
-        if (removed > 0) log($"Pruned {removed} old backup(s).");
+        if (removed > 0) log($"Pruned {removed} old auto-backup(s) (manual backups are kept).");
         return removed;
     }
 }

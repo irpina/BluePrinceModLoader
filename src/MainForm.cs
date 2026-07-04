@@ -318,7 +318,8 @@ public sealed class MainForm : Form
 
     void BackupSaves()
     {
-        try { SaveManager.BackupNow(_backupDir, LogLine); SaveManager.Prune(_backupDir, _settings.MaxBackups, LogLine); }
+        // Manual backups are always kept - never pruned.
+        try { SaveManager.BackupNow(_backupDir, LogLine); }
         catch (Exception ex) { LogLine("ERROR: " + ex.Message); MessageBox.Show(ex.Message, "Backup failed", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
     }
 
