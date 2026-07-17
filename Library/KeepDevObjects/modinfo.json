@@ -1,8 +1,8 @@
 {
   "id": "KeepDevObjects",
   "name": "Keep Dev Objects (Cheat Menu)",
-  "version": "1.2.0",
-  "description": "Enables Blue Prince's built-in developer cheat menu by stopping it from self-deleting on scene load. Activate in-game with mouse button 4.",
+  "version": "1.3.0",
+  "description": "Enables Blue Prince's built-in developer cheat menu by stopping it from self-deleting on scene load. Activate in-game with mouse button 4. F8 toggles the forced overlay off/on.",
   "files": {
     "Mods": [ "KeepDevObjects.dll" ],
     "UserLibs": [ ]

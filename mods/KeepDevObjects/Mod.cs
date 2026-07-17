@@ -6,7 +6,7 @@ using UnityEngine;
 using Il2CppInterop.Runtime;
 using Il2CppHutongGames.PlayMaker.Actions;
 
-[assembly: MelonInfo(typeof(KeepDevObjects.Mod), "Keep Dev Objects", "1.2.0", "datamine")]
+[assembly: MelonInfo(typeof(KeepDevObjects.Mod), "Keep Dev Objects", "1.3.0", "datamine")]
 [assembly: MelonGame(null, null)]
 
 namespace KeepDevObjects
@@ -16,11 +16,13 @@ namespace KeepDevObjects
     // 2) Auto-shows the cheat overlay so the menu appears just from having this mod enabled -
     //    no mouse button 4, no UnityExplorer needed. It activates only the overlay's disabled
     //    parent objects; pop-up menus (Floorplan Selection, Item add) stay closed until you
-    //    press their hotkey.
+    //    press their hotkey. F8 toggles the forced overlay off/on at runtime.
     public class Mod : MelonMod
     {
         private const bool Filtered = true;
-        private const bool AutoShowCheatMenu = true;
+        // F8: the game's own dev hotkeys use F/I/R/T/L/M/P, 0-9 and Space, so a function key is safe.
+        private const KeyCode OverlayToggleKey = KeyCode.F8;
+        private bool _autoShowCheatMenu = true;
 
         private static readonly string[] KeepFilter =
         {
@@ -58,12 +60,30 @@ namespace KeepDevObjects
             HarmonyInstance.Patch(target,
                 prefix: new HarmonyMethod(AccessTools.Method(typeof(Mod), nameof(SkipDestroy))));
 
-            LoggerInstance.Msg($"Patched FurySdkDestroyIfCheatsNotEnabled.OnEnter (filtered={Filtered}, autoShow={AutoShowCheatMenu}).");
+            LoggerInstance.Msg($"Patched FurySdkDestroyIfCheatsNotEnabled.OnEnter (filtered={Filtered}, autoShow={_autoShowCheatMenu}, toggle key={OverlayToggleKey}).");
         }
 
         public override void OnUpdate()
         {
-            if (!AutoShowCheatMenu) return;
+            if (Input.GetKeyDown(OverlayToggleKey))
+            {
+                _autoShowCheatMenu = !_autoShowCheatMenu;
+                LoggerInstance.Msg($"Force overlay {(_autoShowCheatMenu ? "ON" : "OFF")} ({OverlayToggleKey}).");
+                if (_autoShowCheatMenu)
+                {
+                    _frame = 0;
+                    try { EnsureCheatOverlay(); }
+                    catch { _cheatRoot = null; }
+                }
+                else
+                {
+                    try { HideCheatOverlay(); }
+                    catch { _cheatRoot = null; }
+                }
+                return;
+            }
+
+            if (!_autoShowCheatMenu) return;
             if (++_frame < 30) return;   // ~twice a second
             _frame = 0;
             try { EnsureCheatOverlay(); }
@@ -79,14 +99,25 @@ namespace KeepDevObjects
                 if (!_announced) { LoggerInstance.Msg("Cheat menu found - auto-showing overlay."); _announced = true; }
             }
 
+            SetOverlayActive(true);
+        }
+
+        private void HideCheatOverlay()
+        {
+            if (_cheatRoot == null || !RootAlive()) return;
+            SetOverlayActive(false);
+        }
+
+        private void SetOverlayActive(bool active)
+        {
             foreach (var comp in _cheatRoot.GetComponentsInChildren(Il2CppType.Of<Transform>(), true))
             {
                 var t = comp.TryCast<Transform>();
                 if (t == null) continue;
                 foreach (var name in OverlayObjects)
                 {
-                    if (t.name == name && !t.gameObject.activeSelf)
-                        t.gameObject.SetActive(true);
+                    if (t.name == name && t.gameObject.activeSelf != active)
+                        t.gameObject.SetActive(active);
                 }
             }
         }

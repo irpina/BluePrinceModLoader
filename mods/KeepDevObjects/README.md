@@ -27,6 +27,12 @@ On-screen hotkeys (from the game's own overlay):
 | `L` | Luck Up | | `5`/`6` | Camera tilt |
 | | | | `M` | Camera recorder |
 
+Mod hotkey (added by KeepDevObjects itself, not the game):
+
+| Key | Action |
+|-----|--------|
+| `F8` | Toggle the forced overlay off/on. The mod normally keeps the hotkey overlay visible at all times; press `F8` to hide it (and its key handlers), press again to bring it back. |
+
 ## Notes
 
 - Single-player only, no anti-cheat. It can spawn items and set progress flags, so it
